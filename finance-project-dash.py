@@ -244,6 +244,7 @@ from dash import Dash, dcc, html, Input, Output, callback, dash_table
 # If it's in another file, you can import it.
 
 app = Dash(__name__)
+server = app.server
 
 app.layout = html.Div(
     style={'backgroundColor': "#F8F1E1", 'height': '200vh', 'padding': '20px', 'margin': '0'},
