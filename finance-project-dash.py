@@ -1,17 +1,29 @@
 import plotly.graph_objects as go 
+import math
 
 class PotentialSavings:
-    '''
-    '''
     def __init__(self, initial_deposit, add_payment_type, add_payment, annual_growth, time_saved):
+        '''
+        Class returns information on total balance, total growth, how much
+        someone is saving annually and how much you are putting in annually
+
+        Parameters: initial_deposit - how much you put in at the start
+        add_payment_type - monthly or yearly, what type of additional payments
+        are you making?
+        add_payment - how much additional are you depositing
+        annual_growth - how much your money is projected to grow
+        time_saved - how much time are you planning to leave your money in
+        '''
         self.initial_deposit = initial_deposit
         self.add_payment_type = add_payment_type
         self.add_payment = add_payment
-        self.annual_growth = annual_growth
+        self.annual_growth = annual_growth/100
         self.time_saved = time_saved
+
 
     def total_balance(self):
         '''
+        Returns the total balance after x amount of years
         '''
         current_value = 0
         if self.add_payment_type.strip().lower() not in {"monthly", "annually"}:
@@ -33,6 +45,8 @@ class PotentialSavings:
     
     def total_growth(self):
         '''
+        Returns how much your money grew, subtracting the
+        total balance by how much you put in
         '''
         current_value = 0
         if self.add_payment_type.strip().lower() not in {"monthly", "annually"}:
@@ -56,6 +70,7 @@ class PotentialSavings:
     
     def savings(self):
         '''
+        Returns a dictionary with your total balance after every year
         '''
         savings_dict = dict()
         current_value = 0
@@ -85,6 +100,7 @@ class PotentialSavings:
     
     def stationary(self):
         '''
+        Returns how much total money you put in after every year
         '''
         savings_dict = dict()
         current_value = 0
@@ -112,6 +128,8 @@ class PotentialSavings:
  
     def plot(self):
         '''
+        Returns a plotly plot that shows the difference between
+        your total earnings and the money that is put in by year.
         '''
         fig = go.Figure()
         fig.add_trace(go.Scatter(x = list(self.savings().keys()), y = list(self.savings().values()), 
@@ -131,6 +149,43 @@ class PotentialSavings:
             )
         fig.show()
 
+def goal_savings(years, goal_balance, growth_rate):
+    return round((goal_balance * ((growth_rate/100) / 12))/(math.pow(1 + ((growth_rate/100) / 12), years*12) - 1),2)
+
+def plot_goal_savings(years, goal_balance, growth_rate):
+    monthly_contribution = (goal_balance * ((growth_rate/100) / 12))/(math.pow(1 + ((growth_rate/100) / 12), years*12) - 1)
+    current = 0
+    d_growth = dict()
+    d_growth[0] = goal_balance
+    for i in range(years):
+        current += monthly_contribution * 12
+        current = current * (1 + growth_rate/100)
+        d_growth[i+1] = max(0, goal_balance - current)
+    
+    current_no = 0
+    d_no_growth = dict()
+    d_no_growth[0] = goal_balance
+    for i in range(years):
+        current_no += monthly_contribution * 12
+        d_no_growth[i+1] = max(0, goal_balance - current_no)
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=list(d_growth.keys()), y=list(d_growth.values()),
+                             mode="lines", line=dict(color="#698F73"), name='Savings (With Passive Growth)'))
+    fig.add_trace(go.Scatter(x=list(d_no_growth.keys()), y=list(d_no_growth.values()),
+                            mode="lines", name='Savings (Without Passive Growth)'))
+    fig.update_layout(
+        hovermode='x unified',
+        title="Savings Progress Over Time",
+        xaxis_title="Years",
+        yaxis_title="Remaining Balance",
+        title_font_color="#22333B",
+        paper_bgcolor="#E1EAD5",
+        plot_bgcolor="#E1EAD5"
+    )
+    return fig
+
+'''
 import pandas as pd
 import yfinance as yf
 from datetime import datetime
@@ -233,81 +288,142 @@ def ticker_data(indices_tickers):
         "Name": names,
         "Average Ratio": avg_ratios
     })
-
-# Get the average ratios for each index
-
-df = ticker_data(indices_tickers)
-
+'''
+    
 from dash import Dash, dcc, html, Input, Output, callback, dash_table
 
 # Assuming the PotentialSavings class is already defined here
 # If it's in another file, you can import it.
 
 app = Dash(__name__)
-server = app.server
 
 app.layout = html.Div(
-    style={'backgroundColor': "#F8F1E1", 'height': '200vh', 'padding': '20px', 'margin': '0'},
+    style={'backgroundColor': "#F8F1E1", 'height': '210vh', 'padding': '20px', 'margin': '0'},
     children=[
         html.H1("FinanceU: Potential Savings", style={'textAlign': 'center', 'color': '#004225'}),
+        html.H2("Check out the potential of your money over time based off expected annual returns of your indexes or savings account", 
+                style={'textAlign': 'center', 'color': '#004225', 'fontSize':'15px', 'marginBottom':'15px'}),
         html.Div([
-            # First Div (inputs)
             html.Div([
-                html.Label("Initial Deposit ($):", style={'color':'#698F73', 'fontSize':'20px'}),
-                dcc.Input(id='initial-deposit', type='number', min=0, placeholder="e.g. 500.00", style={'marginRight': '10px'}),
+                html.H3("Savings Comp", style = {'color': '#004225', 'fontSize':'30px', 'marginBottom':'0px'}),
+                html.H4("(Calculate your potential balance with consistent savings and growth).",
+                        style = {'color': '#004225', 'fontSize':'15px', 'marginBottom':'15px'}),
+                html.Label("Initial Deposit ($):", style={'color':'#698F73', 'fontSize':'25px'}),
+                dcc.Input(id='initial-deposit', type='number', min=0, value = 500.00, style={'width': '210px', 
+                                                                                                        'height': '40px', 
+                                                                                                        'fontSize': '20px',
+                                                                                                        'border-radius': '5px', 
+                                                                                                        'marginBottom': '10px'}),
                 html.Br(),
-                html.Label("Add Payment Type: ", style={'color':'#698F73', 'fontSize':'20px'}),
-                dcc.Input(id='add-payment-type', type='text', placeholder="e.g. monthly or annually", style={'marginRight': '10px'}),
+                html.Label("Add Payment Type: ", style={'color':'#698F73', 'fontSize':'25px'}),
+                dcc.Dropdown(['Monthly', 'Annually'], id='add-payment-type', value='Monthly', style={'width': '210px', 
+                                                                                                                            'height': '40px', 
+                                                                                                                            'fontSize': '20px',
+                                                                                                                            'border-radius': '5px', 
+                                                                                                                            'marginBottom': '10px'}),
                 html.Br(),
-                html.Label("Additional Payment ($):", style={'color':'#698F73', 'fontSize':'20px'}),
-                dcc.Input(id='add-payment', type='number', min=0, placeholder="e.g. 20.00", style={'marginRight': '10px'}),
+                html.Label("Additional Payment ($):", style={'color':'#698F73', 'fontSize':'25px'}),
+                dcc.Input(id='add-payment', type='number', min=0, value= 20.00 , style={'width': '210px', 
+                                                                                                   'height': '40px', 
+                                                                                                   'fontSize': '20px',
+                                                                                                   'border-radius': '5px', 
+                                                                                                   'marginBottom': '10px'}),
                 html.Br(),
-                html.Label("Annual Growth Rate:", style={'color':'#698F73', 'fontSize':'20px'}),
-                dcc.Input(id='annual-growth', type='number', placeholder="e.g. 0.05 for 5%", min=0, max=1, step="any", style={'marginRight': '10px'}),
+                html.Label("Annual Growth Rate:", style={'color':'#698F73', 'fontSize':'25px'}),
+                dcc.Input(id='annual-growth', type='number', value = 5, min=0, max=100, step="any", style={'width': '210px', 
+                                                                                                                              'height': '40px', 
+                                                                                                                              'fontSize': '20px',
+                                                                                                                              'border-radius': '5px',
+                                                                                                                              'marginBottom': '10px'}),
                 html.Br(),
-                html.Label("Time Saved (years):", style={'color':'#698F73', 'fontSize':'20px'}),
-                dcc.Input(id='time-saved', type='number', placeholder="e.g. 30", step=1, style={'marginRight': '10px'}),
-            ], style={'display': 'flex', 'flexDirection': 'column', 'width': '300px', 'marginLeft':'400px', 'marginRight':'50px'}),  # Input section
+                html.Label("Time Saved (years):", style={'color':'#698F73', 'fontSize':'25px'}),
+                dcc.Input(id='time-saved', type='number', value = 45, step=1, style={'width': '210px', 
+                                                                                                'height': '40px', 
+                                                                                                'fontSize': '20px',
+                                                                                                'border-radius': '5px', 
+                                                                                                'marginBottom': '10px'}),
+            ], style={'display': 'flex', 'flexDirection': 'column', 'width': '300px', 'marginLeft':'10px', 'marginTop': '120px'}),
 
-            # Second Div (Results)
             html.Div([
-                html.H3("Total Balance: ", style={'fontSize':'25px'}),
-                html.Div(id='total-balance', style={'fontSize': '25px', 'fontWeight': 'bold'}),
-                
-                html.H3("Total Growth: ", style={'fontSize':'25px'}),
-                html.Div(id='total-growth', style={'fontSize': '25px', 'fontWeight': 'bold'}),
-            ], style={'display': 'flex', 'flexDirection': 'column', 'marginLeft': '50px'}),  # Results section, with margin
-        ], style={'display': 'flex', 'flexDirection': 'row', 'alignItems': 'flex-start'}),
+                html.Div([
+                    html.Div([
+                        html.H3("Potential Balance: ", style={'fontSize':'25px', 'color': '#004225'}),
+                        html.Div(id='total-balance', style={'fontSize': '25px', 'fontWeight': 'bold', 'color': '#004225',
+                                    'border': '2px black solid', 'padding': '5px', 'minWidth': '100px', 'textAlign': 'center'})
+                    ], style={'display':'flex', 'flexDirection': 'column'}),
 
-        
-        html.Br(),
-        
-        dcc.Graph(id='savings-graph'),
+                    html.Div([
+                        html.H3("Potential Growth: ", style={'fontSize':'25px', 'color': '#004225'}),
+                        html.Div(id='total-growth', style={'fontSize': '25px', 'fontWeight': 'bold', 'color': '#004225',
+                                    'border': '2px black solid', 'padding': '5px', 'minWidth': '100px', 'textAlign': 'center'}),
+                    ], style={'display':'flex', 'flexDirection': 'column'})
+                ], style={'display':'flex', 'flexDirection': 'row', 'marginLeft': '150px', 'gap': '290px'}),
 
-        html.Br(),
-        html.Br(),
+                html.Div([
+                    dcc.Graph(id='savings-graph',
+                              style={'marginLeft': '10px', 'width': '1100px', 'height': '630px', 'marginTop': '20px'})
+                ])
+            ], style={'display': 'flex', 'flexDirection':'column'}),
+        ], style={'display': 'flex', 'flexDirection': 'row', 'marginBottom':'20px'}),
 
-        dash_table.DataTable(
-            id='table',
-            columns=[{"name": col, "id": col} for col in df.columns],
-            data=df.to_dict('records'),
-            style_cell={'textAlign': 'center','backgroundColor':'#E1EAD5'},
-            style_header={'fontWeight':'bold','backgroundColor':'#698F73'}
-        )
+        html.Div([
+            html.Div([
+                html.H3("Savings Goal", style = {'color': '#004225', 'fontSize':'30px', 'marginBottom':'0px'}),
+                html.H4("(Calculate your monthly deposits to achieve your financial goals.)",
+                        style = {'color': '#004225', 'fontSize':'15px', 'marginBottom':'15px'}),
+                html.Label("Savings Goal ($):", style={'color':'#698F73', 'fontSize':'25px'}),
+                dcc.Input(id='savings-goal', type='number', min=0, value= 10000.00 , style={'width': '210px', 
+                                                                                                   'height': '40px', 
+                                                                                                   'fontSize': '20px',
+                                                                                                   'border-radius': '5px', 
+                                                                                                   'marginBottom': '10px'}),
+                html.Br(),
+                html.Label("Goal Time (Years):", style={'color':'#698F73', 'fontSize':'25px'}),
+                dcc.Input(id='goal-time-saved', type='number', value = 15, step=1, style={'width': '210px', 
+                                                                                          'height': '40px',
+                                                                                          'fontSize': '20px',
+                                                                                          'border-radius': '5px',
+                                                                                          'marginBottom': '10px'}),
+                html.Br(),
+                html.Label("Expected Growth Rate (%):", style={'color':'#698F73', 'fontSize':'25px'}),
+                dcc.Input(id='potential-growth-rate', type='number', value = 8, min=0, max=100, step="any", style={'width': '210px', 
+                                                                                                                              'height': '40px', 
+                                                                                                                              'fontSize': '20px',
+                                                                                                                              'border-radius': '5px',
+                                                                                                                              'marginBottom': '10px'})
+            ], style={'display': 'flex', 'flexDirection': 'column', 'width': '300px', 'marginLeft':'10px', 'marginTop': '120px'}),
+
+            html.Div([
+                html.Div([
+                    html.H3("Required Monthly Deposit ($):", 
+                            style={'fontSize': '25px', 'color': '#004225', 'marginRight': '10px'}),
+                    html.Div(id='monthly-deposit', 
+                            style={'fontSize': '25px', 'fontWeight': 'bold', 'color': '#004225',
+                                    'border': '2px black solid', 'padding': '5px', 'minWidth': '100px', 'textAlign': 'center'})
+                ], style={'display': 'flex', 'flexDirection': 'row', 'alignItems': 'center', 'marginTop': '15px'}),
+                dcc.Graph(id='savings-graph-2',
+                            style={'marginLeft': '10px', 'width': '1100px', 'height': '500px', 'marginTop': '5px'})
+            ], style={'display': 'flex', 'flexDirection':'column'})
+        ], style={'display': 'flex', 'flexDirection': 'row'})
     ]
 )
 
 @app.callback(
     [Output('total-balance', 'children'),
      Output('total-growth', 'children'),
-     Output('savings-graph', 'figure')],
+     Output('savings-graph', 'figure'),
+     Output('monthly-deposit','children'),
+     Output('savings-graph-2','figure')],
     [Input('initial-deposit', 'value'),
      Input('add-payment-type', 'value'),
      Input('add-payment', 'value'),
      Input('annual-growth', 'value'),
-     Input('time-saved', 'value')]
+     Input('time-saved', 'value'),
+     Input('goal-time-saved','value'),
+     Input('savings-goal','value'),
+     Input('potential-growth-rate','value')]
 )
-def update_results(initial_deposit, add_payment_type, add_payment, annual_growth, time_saved):
+def update_results(initial_deposit, add_payment_type, add_payment, annual_growth, time_saved, goal_time, savings_goal, potential_growth_rate):
     # Create an instance of PotentialSavings
     ps = PotentialSavings(
         initial_deposit=float(initial_deposit),
@@ -327,10 +443,33 @@ def update_results(initial_deposit, add_payment_type, add_payment, annual_growth
                             mode="lines", line=dict(color="#698F73"), fill="tozeroy", name="Annual Investment"))
     fig.add_trace(go.Scatter(x=list(ps.stationary().keys()), y=list(ps.stationary().values()),
                             mode="lines", line=dict(color="#0A5A9C"), fill="tozeroy", name="Annual Investment (No Return)"))
-    fig.update_layout(title="Savings Comparison", xaxis_title="Years Saved", yaxis_title="Value in Dollars ($)",
+    fig.update_layout(hovermode = "x unified", title="Savings Comparison", xaxis_title="Years Saved", yaxis_title="Value in Dollars ($)",
                       title_font_color="#22333B", paper_bgcolor="#E1EAD5", plot_bgcolor="#E1EAD5")
     
-    return f"${total_balance}", f"${total_growth}", fig
+    # Calculate required monthly deposit for goal savings
+    monthly_deposit = goal_savings(goal_time, savings_goal, potential_growth_rate)
+
+    # Plot savings goal progress
+    fig2 = plot_goal_savings(goal_time, savings_goal, potential_growth_rate)
+
+    return f"${total_balance:,.2f}", f"${total_growth:,.2f}", fig, monthly_deposit, fig2
 
 if __name__ == '__main__':
     app.run_server()
+
+            # Second Div (Results)
+'''
+            html.Div([
+                html.H3("Total Balance: ", style={'fontSize':'25px'}),
+                html.Div(id='total-balance', style={'fontSize': '25px', 'fontWeight': 'bold'}),
+                
+                html.H3("Total Growth: ", style={'fontSize':'25px'}),
+                html.Div(id='total-growth', style={'fontSize': '25px', 'fontWeight': 'bold'}),
+            ], style={'display': 'flex', 'flexDirection': 'column', 'marginLeft': '50px'}),  # Results section, with margin
+        ], style={'display': 'flex', 'flexDirection': 'row', 'alignItems': 'flex-start'}),
+
+        
+        html.Br(),
+        
+        dcc.Graph(id='savings-graph')
+'''
