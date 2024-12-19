@@ -300,9 +300,10 @@ app = Dash(__name__)
 app.layout = html.Div(
     style={'backgroundColor': "#F8F1E1", 'height': '210vh', 'padding': '20px', 'margin': '0'},
     children=[
-        html.H1("FinanceU: Potential Savings", style={'textAlign': 'center', 'color': '#004225'}),
+        html.H1("FinanceU: Potential Savings", style={'marginLeft':'10px', 'color': '#004225'}),
         html.H2("Check out the potential of your money over time based off expected annual returns of your indexes or savings account", 
-                style={'textAlign': 'center', 'color': '#004225', 'fontSize':'15px', 'marginBottom':'15px'}),
+                style={'marginLeft':'10px', 'color': '#004225', 'fontSize':'20px', 'marginBottom':'15px'}),
+        html.Hr(style={'borderWidth': '2px', 'borderColor': '#004225', 'width': '100%', 'margin': '0px auto'}),
         html.Div([
             html.Div([
                 html.H3("Savings Comp", style = {'color': '#004225', 'fontSize':'30px', 'marginBottom':'0px'}),
