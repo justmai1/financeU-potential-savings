@@ -1,2 +1,3 @@
-# financeU-potential-savings
+# FinanceU - Potential Savings
+
 FinanceU - Potential Savings
