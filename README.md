@@ -1,6 +1,6 @@
 <!-- Title -->
 <div align="center">
-    <h1>FinanceU: Potential Savings</h1>
+    <h1>FinanceU: Spending Habit Tracker / Savings App</h1>
     <h2>
         A databased app to track spending habits and guide actions toward passive income.
     </h2>
