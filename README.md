@@ -21,6 +21,17 @@
             <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg" alt="CSS" width="200"/>
         </div>
     </div>
+    <div>
+        <h3>
+            <b>Showcase</b>
+        </h3>
+        <div style="display:flex; align-items: flex-start; flex-direction: column">
+            <img src="https://github.com/justmai1/financeU-potential-savings/blob/img/potential-savings.png">
+            <img src="https://github.com/justmai1/financeU-potential-savings/blob/img/newplot%20(2).png">
+            <img src="https://github.com/justmai1/financeU-potential-savings/blob/img/newplot%20(1).png">
+            <img src="https://github.com/justmai1/financeU-potential-savings/blob/img/summaries.png">
+        </div>
+    </div>
 </div>
 
 ## Sections
