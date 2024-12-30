@@ -25,7 +25,6 @@
 
 ## Sections
 - [Features](#features)
-- [Example Usages](#example-usage)
 - [Development Process](#development-process)
 
 
@@ -45,7 +44,7 @@
     - Live bar graph for users to visualize their daily spendings vs. daily earnings
     - Live updates to user summary statistics (using SQL queries) displayed
   
-## Example Usages
-
 ## Development Process
+
+
           
