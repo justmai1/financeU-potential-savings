@@ -21,22 +21,22 @@
             <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg" alt="CSS" width="200"/>
         </div>
     </div>
-    <div>
-        <h3>
-            <b>Showcase</b>
-        </h3>
-        <div style="display:flex; align-items: flex-start; flex-direction: column">
-            <img src="https://github.com/justmai1/financeU-potential-savings/blob/img/potential-savings.png">
-            <img src="https://github.com/justmai1/financeU-potential-savings/blob/img/newplot%20(2).png">
-            <img src="https://github.com/justmai1/financeU-potential-savings/blob/img/newplot%20(1).png">
-            <img src="https://github.com/justmai1/financeU-potential-savings/blob/img/summaries.png">
-        </div>
-    </div>
 </div>
 
 ## Sections
 - [Features](#features)
 - [Development Process](#development-process)
+- [Showcase](#showcase)
+
+## Showcase
+<div align=center>
+    <div style="display:flex; align-items: flex-start; flex-direction: column">
+        <img src="https://github.com/justmai1/financeU-potential-savings/blob/img/potential-savings.png">
+        <img src="https://github.com/justmai1/financeU-potential-savings/blob/img/newplot%20(2).png">
+        <img src="https://github.com/justmai1/financeU-potential-savings/blob/img/newplot%20(1).png">
+        <img src="https://github.com/justmai1/financeU-potential-savings/blob/img/summaries.png">
+    </div>
+</div>
 
 
 ## Features
@@ -56,6 +56,17 @@
     - Live updates to user summary statistics (using SQL queries) displayed
   
 ## Development Process
+The app was created using the *Dash* library in Python to seamlessly connect *Plotly* graphs to the interface.
 
+1. Potential Savings
+    - Create functions retrieving total values (balance and growth) base off inputs
+    - Create functions that returns a dictionary of savings by the year (for plot)
+    - Develop mathematical formula to get the amount a user must invest a month to meet their goal
+    - Using *Dash* library in Python (which contains CSS and HTML), to connect the inputs to stationary outputs and graph outputs
+2. Spending Habit Tracker
+    - Connect Python to SQL Database using *pyodbc* library
+    - Connect insert statements within the query to inputs displayed on the client side
+    - Writing queries to display neccessary information about the table inserted to retrieve necessary statistics
+    - Use *Dash* to update plots and other summary statistics live as users submit their spendings and earnings
 
           
