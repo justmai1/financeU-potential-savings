@@ -24,9 +24,9 @@
 </div>
 
 ## Sections
+- [Showcase](#showcase)
 - [Features](#features)
 - [Development Process](#development-process)
-- [Showcase](#showcase)
 
 ## Showcase
 <div align=center>
